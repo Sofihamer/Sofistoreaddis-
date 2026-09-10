@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>SofiStore Addis</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f3f4f6;color:#111827}
+header{background:#111827;color:white;padding:22px 18px 18px;position:sticky;top:0;z-index:5}
+h1{margin:0;font-size:23px}.sub{opacity:.7;font-size:13px;margin-top:4px}
+main{max-width:850px;margin:auto;padding:14px 14px 90px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.card{background:white;border-radius:16px;padding:16px;box-shadow:0 1px 5px #00000012}.label{font-size:12px;color:#6b7280}.value{font-size:22px;font-weight:750;margin-top:5px}
+.tabs{display:flex;gap:8px;overflow:auto;padding:12px 0}.tabs button{border:0;border-radius:999px;padding:10px 15px;background:white}.tabs .active{background:#111827;color:white}
+button{font:inherit;cursor:pointer}.primary{background:#111827;color:white;border:0;border-radius:12px;padding:12px 15px;font-weight:650}
+input,select{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:10px;background:white;font:inherit;margin:5px 0 10px}
+.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}.item{margin-top:10px}.item strong{font-size:16px}.muted{color:#6b7280;font-size:13px}
+.badge{display:inline-block;background:#ecfdf5;color:#047857;padding:4px 8px;border-radius:999px;font-size:12px;margin-top:7px}
+.danger{color:#b91c1c}.empty{text-align:center;padding:35px;color:#6b7280}
+.modal{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;z-index:20}.modal.show{display:flex}.sheet{background:white;width:100%;border-radius:22px 22px 0 0;padding:20px;max-height:90vh;overflow:auto}
+.actions{display:flex;gap:8px;margin-top:8px}.actions button{flex:1}.secondary{border:1px solid #d1d5db;background:white;border-radius:12px;padding:11px}
+hr{border:0;border-top:1px solid #eee;margin:14px 0}
+</style>
+</head>
+<body>
+<header><h1>SofiStore Addis</h1><div class="sub">Inventory & Profit Manager · ETB</div></header>
+<main>
+<div class="tabs">
+<button class="active" onclick="tab('dash',this)">Dashboard</button><button onclick="tab('stock',this)">Stock</button><button onclick="tab('sales',this)">Sales</button>
+</div>
+
+<section id="dash">
+<div class="grid">
+<div class="card"><div class="label">Stock units</div><div class="value" id="stockCount">0</div></div>
+<div class="card"><div class="label">Stock value</div><div class="value" id="stockValue">0 ETB</div></div>
+<div class="card"><div class="label">This week sales</div><div class="value" id="weekSales">0 ETB</div></div>
+<div class="card"><div class="label">This week profit</div><div class="value" id="weekProfit">0 ETB</div></div>
+</div>
+<div class="card" style="margin-top:10px"><b>Quick actions</b><div class="actions"><button class="primary" onclick="openAdd()">+ Add item</button><button class="secondary" onclick="tab('sales',document.querySelectorAll('.tabs button')[2])">Record sale</button></div></div>
+<div class="card" style="margin-top:10px"><b>Recent sales</b><div id="recent"></div></div>
+</section>
+
+<section id="stock" style="display:none">
+<div class="card"><div class="row"><input id="search" placeholder="Search model or IMEI" oninput="renderStock()"><button class="primary" onclick="openAdd()">+ Add</button></div><div id="stockList"></div></div>
+</section>
+
+<section id="sales" style="display:none">
+<div class="card"><b>Record a sale</b>
+<select id="saleItem"></select><input id="salePrice" type="number" placeholder="Selling price (ETB)"><input id="saleQty" type="number" min="1" value="1" placeholder="Quantity">
+<button class="primary" onclick="sell()">Record sale</button></div>
+<div class="card" style="margin-top:10px"><b>All sales</b><div id="salesList"></div></div>
+</section>
+</main>
+
+<div class="modal" id="modal"><div class="sheet">
+<h2 style="margin-top:0">Add inventory item</h2>
+<input id="mModel" placeholder="Model (e.g. iPhone 15 Pro)">
+<input id="mSpec" placeholder="Specifications / storage / color">
+<input id="mImei" placeholder="IMEI / serial number">
+<input id="mBuy" type="number" placeholder="Buying price (ETB)">
+<input id="mSell" type="number" placeholder="Selling price (ETB)">
+<input id="mQty" type="number" min="1" value="1" placeholder="Quantity">
+<div class="actions"><button class="secondary" onclick="closeAdd()">Cancel</button><button class="primary" onclick="addItem()">Save item</button></div>
+</div></div>
+
+<script>
+const KEY='sofistore_inventory_v1';
+let db=JSON.parse(localStorage.getItem(KEY)||'{"items":[],"sales":[]}');
+const money=n=>Number(n||0).toLocaleString('en-US',{maximumFractionDigits:0})+' ETB';
+const save=()=>{localStorage.setItem(KEY,JSON.stringify(db));render()};
+function tab(id,btn){document.querySelectorAll('main section').forEach(x=>x.style.display='none');document.getElementById(id).style.display='block';document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');render()}
+function openAdd(){document.getElementById('modal').classList.add('show')}
+function closeAdd(){document.getElementById('modal').classList.remove('show')}
+function addItem(){
+ let model=mModel.value.trim(); if(!model)return alert('Enter a model.');
+ let item={id:Date.now(),model,spec:mSpec.value.trim(),imei:mImei.value.trim(),buy:+mBuy.value||0,sell:+mSell.value||0,qty:+mQty.value||1,created:new Date().toISOString()};
+ db.items.push(item); save(); closeAdd(); ['mModel','mSpec','mImei','mBuy','mSell'].forEach(x=>document.getElementById(x).value=''); mQty.value=1;
+}
+function render(){
+ let items=db.items, sales=db.sales, now=Date.now(), week=now-7*86400000;
+ let units=items.reduce((a,x)=>a+x.qty,0), value=items.reduce((a,x)=>a+x.qty*x.buy,0);
+ let ws=sales.filter(x=>new Date(x.date).getTime()>=week);
+ stockCount.textContent=units;stockValue.textContent=money(value);weekSales.textContent=money(ws.reduce((a,x)=>a+x.total,0));weekProfit.textContent=money(ws.reduce((a,x)=>a+x.profit,0));
+ recent.innerHTML=ws.slice(-5).reverse().map(x=>`<div class="item"><strong>${x.model}</strong><div class="muted">${new Date(x.date).toLocaleString()} · ${x.qty} unit</div><span class="badge">Profit ${money(x.profit)}</span></div>`).join('')||'<div class="empty">No sales this week.</div>';
+ renderStock();renderSales();
+}
+function renderStock(){
+ let q=(search?.value||'').toLowerCase(), arr=db.items.filter(x=>(x.model+' '+x.spec+' '+x.imei).toLowerCase().includes(q));
+ stockList.innerHTML=arr.map(x=>`<div class="item"><strong>${x.model}</strong><div class="muted">${x.spec||'No specs'} · IMEI ${x.imei||'—'}</div><div>Buy ${money(x.buy)} · Sell ${money(x.sell)} · <b>${x.qty}</b> in stock</div><div class="muted">Profit/unit: ${money(x.sell-x.buy)}</div><button class="secondary" style="margin-top:7px" onclick="removeItem(${x.id})">Remove</button></div><hr>`).join('')||'<div class="empty">No inventory found.</div>';
+ saleItem.innerHTML=db.items.filter(x=>x.qty>0).map(x=>`<option value="${x.id}">${x.model}${x.spec?' · '+x.spec:''} — ${money(x.sell)}</option>`).join('')||'<option>No stock available</option>';
+}
+function renderSales(){
+ salesList.innerHTML=db.sales.slice().reverse().map(x=>`<div class="item"><strong>${x.model}</strong><div class="muted">${new Date(x.date).toLocaleString()} · ${x.qty} × ${money(x.price)}</div><span class="badge">Profit ${money(x.profit)}</span></div><hr>`).join('')||'<div class="empty">No sales recorded.</div>';
+}
+function sell(){
+ let id=+saleItem.value,x=db.items.find(a=>a.id===id);if(!x||x.qty<=0)return alert('No stock available.');
+ let qty=Math.max(1,+saleQty.value||1);if(qty>x.qty)return alert('Not enough stock.');
+ let price=+salePrice.value||x.sell;if(price<=0)return alert('Enter selling price.');
+ x.qty-=qty;db.sales.push({id:Date.now(),itemId:id,model:x.model,qty,price,total:price*qty,profit:(price-x.buy)*qty,date:new Date().toISOString()});save();salePrice.value='';saleQty.value=1;alert('Sale recorded.');
+}
+function removeItem(id){if(confirm('Remove this item from inventory?')){db.items=db.items.filter(x=>x.id!==id);save()}}
+render();
+</script>
+</body></html>
