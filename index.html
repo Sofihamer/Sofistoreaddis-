@@ -3,102 +3,82 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#111827">
 <title>SofiStore Addis</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f3f4f6;color:#111827}
-header{background:#111827;color:white;padding:22px 18px 18px;position:sticky;top:0;z-index:5}
-h1{margin:0;font-size:23px}.sub{opacity:.7;font-size:13px;margin-top:4px}
-main{max-width:850px;margin:auto;padding:14px 14px 90px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.card{background:white;border-radius:16px;padding:16px;box-shadow:0 1px 5px #00000012}.label{font-size:12px;color:#6b7280}.value{font-size:22px;font-weight:750;margin-top:5px}
-.tabs{display:flex;gap:8px;overflow:auto;padding:12px 0}.tabs button{border:0;border-radius:999px;padding:10px 15px;background:white}.tabs .active{background:#111827;color:white}
-button{font:inherit;cursor:pointer}.primary{background:#111827;color:white;border:0;border-radius:12px;padding:12px 15px;font-weight:650}
-input,select{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:10px;background:white;font:inherit;margin:5px 0 10px}
-.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}.item{margin-top:10px}.item strong{font-size:16px}.muted{color:#6b7280;font-size:13px}
-.badge{display:inline-block;background:#ecfdf5;color:#047857;padding:4px 8px;border-radius:999px;font-size:12px;margin-top:7px}
-.danger{color:#b91c1c}.empty{text-align:center;padding:35px;color:#6b7280}
-.modal{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;z-index:20}.modal.show{display:flex}.sheet{background:white;width:100%;border-radius:22px 22px 0 0;padding:20px;max-height:90vh;overflow:auto}
-.actions{display:flex;gap:8px;margin-top:8px}.actions button{flex:1}.secondary{border:1px solid #d1d5db;background:white;border-radius:12px;padding:11px}
-hr{border:0;border-top:1px solid #eee;margin:14px 0}
+:root{--blue:#1463ff;--bg:#f5f7fb;--card:#fff;--text:#14213d;--muted:#718096;--green:#16a34a}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+.app{max-width:520px;margin:auto;padding:18px 16px 28px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.brand{font-weight:800;font-size:20px}.sub{font-size:12px;color:var(--muted);margin-top:2px}.bell{font-size:22px}
+h1{font-size:24px;margin:0 0 4px}.muted{color:var(--muted);font-size:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
+.card{background:var(--card);border-radius:16px;padding:16px;box-shadow:0 3px 14px #102a430d}.label{font-size:12px;color:var(--muted)}.value{font-size:20px;font-weight:800;margin-top:6px}
+.goal{background:linear-gradient(135deg,#0f5fe8,#3284ff);color:white;border-radius:18px;padding:18px;margin:12px 0 18px}.goal .label{color:#dbeafe}
+.goalrow{display:flex;justify-content:space-between;gap:12px;align-items:center}.goalvalue{font-size:25px;font-weight:850;margin:5px 0 12px}
+.bar{height:10px;background:#ffffff40;border-radius:99px;overflow:hidden}.fill{height:100%;background:white;border-radius:99px;width:0}
+.progress{display:flex;justify-content:space-between;font-size:12px;margin-top:9px}
+button{border:0;border-radius:12px;padding:11px 14px;font-weight:700;cursor:pointer}.edit{background:white;color:var(--blue)}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.action{background:white;text-align:left;padding:15px;border-radius:15px;border:1px solid #e7ebf2}
+.action b{display:block;margin-top:7px}.section{margin-top:20px;font-size:16px;font-weight:800}
+nav{position:sticky;bottom:8px;background:#fff;border-radius:18px;padding:10px 6px;margin-top:22px;display:grid;grid-template-columns:repeat(5,1fr);box-shadow:0 5px 25px #102a4318}
+nav span{text-align:center;font-size:11px;color:var(--muted)}nav b{display:block;font-size:18px;margin-bottom:3px;color:var(--blue)}
+dialog{border:0;border-radius:20px;padding:20px;max-width:340px;width:calc(100% - 32px);box-shadow:0 20px 60px #0003}dialog::backdrop{background:#0006}
+input{width:100%;padding:13px;border:1px solid #d8dee9;border-radius:12px;font-size:16px;margin:10px 0 14px} .save{background:var(--blue);color:#fff;width:100%}.cancel{background:#eef2f7;width:100%;margin-top:8px}
 </style>
 </head>
 <body>
-<header><h1>SofiStore Addis</h1><div class="sub">Inventory & Profit Manager · ETB</div></header>
-<main>
-<div class="tabs">
-<button class="active" onclick="tab('dash',this)">Dashboard</button><button onclick="tab('stock',this)">Stock</button><button onclick="tab('sales',this)">Sales</button>
-</div>
+<main class="app">
+  <div class="top"><div><div class="brand">SofiStore Addis</div><div class="sub">Smart Business Control Center</div></div><div class="bell">🔔</div></div>
+  <h1>Good morning 👋</h1><div class="muted">Your store at a glance.</div>
 
-<section id="dash">
-<div class="grid">
-<div class="card"><div class="label">Stock units</div><div class="value" id="stockCount">0</div></div>
-<div class="card"><div class="label">Stock value</div><div class="value" id="stockValue">0 ETB</div></div>
-<div class="card"><div class="label">This week sales</div><div class="value" id="weekSales">0 ETB</div></div>
-<div class="card"><div class="label">This week profit</div><div class="value" id="weekProfit">0 ETB</div></div>
-</div>
-<div class="card" style="margin-top:10px"><b>Quick actions</b><div class="actions"><button class="primary" onclick="openAdd()">+ Add item</button><button class="secondary" onclick="tab('sales',document.querySelectorAll('.tabs button')[2])">Record sale</button></div></div>
-<div class="card" style="margin-top:10px"><b>Recent sales</b><div id="recent"></div></div>
-</section>
+  <section class="grid">
+    <div class="card"><div class="label">Sales</div><div class="value">0 ETB</div></div>
+    <div class="card"><div class="label">Profit</div><div class="value">0 ETB</div></div>
+    <div class="card"><div class="label">Stock value</div><div class="value">0 ETB</div></div>
+    <div class="card"><div class="label">Receivable</div><div class="value">0 ETB</div></div>
+  </section>
 
-<section id="stock" style="display:none">
-<div class="card"><div class="row"><input id="search" placeholder="Search model or IMEI" oninput="renderStock()"><button class="primary" onclick="openAdd()">+ Add</button></div><div id="stockList"></div></div>
-</section>
+  <section class="goal">
+    <div class="goalrow"><div><div class="label">🎯 DAILY REACHABLE GOAL</div><div class="goalvalue" id="goal">50,000 ETB</div></div><button class="edit" id="edit">Edit goal</button></div>
+    <div class="bar"><div class="fill" id="fill"></div></div>
+    <div class="progress"><span id="status">0 ETB reached</span><span id="remain">50,000 ETB left</span></div>
+  </section>
 
-<section id="sales" style="display:none">
-<div class="card"><b>Record a sale</b>
-<select id="saleItem"></select><input id="salePrice" type="number" placeholder="Selling price (ETB)"><input id="saleQty" type="number" min="1" value="1" placeholder="Quantity">
-<button class="primary" onclick="sell()">Record sale</button></div>
-<div class="card" style="margin-top:10px"><b>All sales</b><div id="salesList"></div></div>
-</section>
+  <div class="section">Quick actions <span class="muted" style="float:right;font-weight:500">One tap</span></div>
+  <section class="actions">
+    <button class="action">＋<b>Add phone</b></button>
+    <button class="action">↗<b>Receive stock</b></button>
+    <button class="action">↗<b>New sale</b></button>
+    <button class="action">◈<b>Cash / exchange</b></button>
+    <button class="action">⌁<b>Accounts & debts</b></button>
+    <button class="action">⌁<b>Reports</b></button>
+  </section>
+
+  <div class="section">Sales trend <span class="muted" style="float:right;font-weight:500">Last 7 days</span></div>
+  <div class="card" style="height:120px;margin-top:10px"><svg viewBox="0 0 500 90" width="100%" height="90" preserveAspectRatio="none"><polyline points="0,72 75,58 145,68 215,35 285,52 360,28 430,44 500,18" fill="none" stroke="#1463ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+  <div class="section">Money accounts <span class="muted" style="float:right;font-weight:500">Live balance</span></div>
+  <div class="card" style="margin-top:10px">💰 <b>Cash</b><span style="float:right">0 ETB</span></div>
+
+  <nav><span><b>⌂</b>Home</span><span><b>▦</b>Inventory</span><span><b>↗</b>Sales</span><span><b>◈</b>Money</span><span><b>⌁</b>Reports</span></nav>
 </main>
 
-<div class="modal" id="modal"><div class="sheet">
-<h2 style="margin-top:0">Add inventory item</h2>
-<input id="mModel" placeholder="Model (e.g. iPhone 15 Pro)">
-<input id="mSpec" placeholder="Specifications / storage / color">
-<input id="mImei" placeholder="IMEI / serial number">
-<input id="mBuy" type="number" placeholder="Buying price (ETB)">
-<input id="mSell" type="number" placeholder="Selling price (ETB)">
-<input id="mQty" type="number" min="1" value="1" placeholder="Quantity">
-<div class="actions"><button class="secondary" onclick="closeAdd()">Cancel</button><button class="primary" onclick="addItem()">Save item</button></div>
-</div></div>
+<dialog id="dlg">
+  <h3 style="margin:0">Set daily goal</h3>
+  <div class="muted" style="margin-top:5px">Choose a target you can adjust anytime.</div>
+  <input id="goalInput" type="number" min="1" step="100" value="50000" inputmode="numeric">
+  <button class="save" id="save">Save goal</button>
+  <button class="cancel" id="cancel">Cancel</button>
+</dialog>
 
 <script>
-const KEY='sofistore_inventory_v1';
-let db=JSON.parse(localStorage.getItem(KEY)||'{"items":[],"sales":[]}');
-const money=n=>Number(n||0).toLocaleString('en-US',{maximumFractionDigits:0})+' ETB';
-const save=()=>{localStorage.setItem(KEY,JSON.stringify(db));render()};
-function tab(id,btn){document.querySelectorAll('main section').forEach(x=>x.style.display='none');document.getElementById(id).style.display='block';document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');render()}
-function openAdd(){document.getElementById('modal').classList.add('show')}
-function closeAdd(){document.getElementById('modal').classList.remove('show')}
-function addItem(){
- let model=mModel.value.trim(); if(!model)return alert('Enter a model.');
- let item={id:Date.now(),model,spec:mSpec.value.trim(),imei:mImei.value.trim(),buy:+mBuy.value||0,sell:+mSell.value||0,qty:+mQty.value||1,created:new Date().toISOString()};
- db.items.push(item); save(); closeAdd(); ['mModel','mSpec','mImei','mBuy','mSell'].forEach(x=>document.getElementById(x).value=''); mQty.value=1;
-}
-function render(){
- let items=db.items, sales=db.sales, now=Date.now(), week=now-7*86400000;
- let units=items.reduce((a,x)=>a+x.qty,0), value=items.reduce((a,x)=>a+x.qty*x.buy,0);
- let ws=sales.filter(x=>new Date(x.date).getTime()>=week);
- stockCount.textContent=units;stockValue.textContent=money(value);weekSales.textContent=money(ws.reduce((a,x)=>a+x.total,0));weekProfit.textContent=money(ws.reduce((a,x)=>a+x.profit,0));
- recent.innerHTML=ws.slice(-5).reverse().map(x=>`<div class="item"><strong>${x.model}</strong><div class="muted">${new Date(x.date).toLocaleString()} · ${x.qty} unit</div><span class="badge">Profit ${money(x.profit)}</span></div>`).join('')||'<div class="empty">No sales this week.</div>';
- renderStock();renderSales();
-}
-function renderStock(){
- let q=(search?.value||'').toLowerCase(), arr=db.items.filter(x=>(x.model+' '+x.spec+' '+x.imei).toLowerCase().includes(q));
- stockList.innerHTML=arr.map(x=>`<div class="item"><strong>${x.model}</strong><div class="muted">${x.spec||'No specs'} · IMEI ${x.imei||'—'}</div><div>Buy ${money(x.buy)} · Sell ${money(x.sell)} · <b>${x.qty}</b> in stock</div><div class="muted">Profit/unit: ${money(x.sell-x.buy)}</div><button class="secondary" style="margin-top:7px" onclick="removeItem(${x.id})">Remove</button></div><hr>`).join('')||'<div class="empty">No inventory found.</div>';
- saleItem.innerHTML=db.items.filter(x=>x.qty>0).map(x=>`<option value="${x.id}">${x.model}${x.spec?' · '+x.spec:''} — ${money(x.sell)}</option>`).join('')||'<option>No stock available</option>';
-}
-function renderSales(){
- salesList.innerHTML=db.sales.slice().reverse().map(x=>`<div class="item"><strong>${x.model}</strong><div class="muted">${new Date(x.date).toLocaleString()} · ${x.qty} × ${money(x.price)}</div><span class="badge">Profit ${money(x.profit)}</span></div><hr>`).join('')||'<div class="empty">No sales recorded.</div>';
-}
-function sell(){
- let id=+saleItem.value,x=db.items.find(a=>a.id===id);if(!x||x.qty<=0)return alert('No stock available.');
- let qty=Math.max(1,+saleQty.value||1);if(qty>x.qty)return alert('Not enough stock.');
- let price=+salePrice.value||x.sell;if(price<=0)return alert('Enter selling price.');
- x.qty-=qty;db.sales.push({id:Date.now(),itemId:id,model:x.model,qty,price,total:price*qty,profit:(price-x.buy)*qty,date:new Date().toISOString()});save();salePrice.value='';saleQty.value=1;alert('Sale recorded.');
-}
-function removeItem(id){if(confirm('Remove this item from inventory?')){db.items=db.items.filter(x=>x.id!==id);save()}}
+const dlg=document.getElementById('dlg'), input=document.getElementById('goalInput'), goal=document.getElementById('goal'), fill=document.getElementById('fill'), status=document.getElementById('status'), remain=document.getElementById('remain');
+let target=50000, sales=0;
+function money(n){return new Intl.NumberFormat('en-US').format(n)+' ETB'}
+function render(){goal.textContent=money(target);let pct=Math.min(100,(sales/target)*100);fill.style.width=pct+'%';status.textContent=money(sales)+' reached';remain.textContent=money(Math.max(0,target-sales))+' left'}
+document.getElementById('edit').onclick=()=>{input.value=target;dlg.showModal();input.focus()}
+document.getElementById('save').onclick=()=>{let v=Number(input.value);if(v>0){target=v;render();dlg.close()}}
+document.getElementById('cancel').onclick=()=>dlg.close();
 render();
 </script>
-</body></html>
+</body>
+</html>
